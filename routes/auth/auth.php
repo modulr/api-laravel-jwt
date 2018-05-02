@@ -5,13 +5,13 @@ Route::group([
     'middleware' => 'api',
     'prefix' => 'auth'
 ], function () {
+    Route::post('/login', 'AuthController@login');
     Route::post('/signup', 'AuthController@signup');
-    Route::post('/signin', 'AuthController@signin');
 
     Route::group([
         'middleware' => 'jwt.auth',
     ], function () {
-        Route::get('/signout', 'AuthController@signout');
+        Route::get('/logout', 'AuthController@logout');
         Route::get('/user', 'AuthController@user');
     });
 });

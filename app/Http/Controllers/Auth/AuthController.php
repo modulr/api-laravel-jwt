@@ -47,7 +47,7 @@ class AuthController extends Controller
      * @param  [string] rememberMe
      * @return [json] token, error
      */
-    public function signin(Request $request)
+    public function login(Request $request)
     {
         $request->validate([
             'email' => 'required|string|email',
@@ -74,7 +74,7 @@ class AuthController extends Controller
      *
      * @return [json] message
      */
-    public function signout()
+    public function logout()
     {
         auth()->logout();
 
