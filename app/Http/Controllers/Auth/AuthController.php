@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Auth;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Avatar;
+use Storage;
 use App\User;
 
 class AuthController extends Controller
@@ -33,6 +35,9 @@ class AuthController extends Controller
         ]);
 
         $user->save();
+
+        $avatar = Avatar::create($user->name)->getImageObject()->encode('png');
+        Storage::put('avatars/'.$user->id.'/avatar.png', (string) $avatar);
 
         return response()->json([
             'message' => 'Successfully created user!'
