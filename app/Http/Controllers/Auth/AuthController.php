@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Auth;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
-use Avatar;
 use Storage;
+use Avatar;
+use Carbon\Carbon;
 use App\User;
 
 class AuthController extends Controller
@@ -49,7 +49,7 @@ class AuthController extends Controller
      *
      * @param  [string] email
      * @param  [string] password
-     * @param  [string] rememberMe
+     * @param  [boolean] remember_me
      * @return [json] token, error
      */
     public function login(Request $request)
@@ -60,8 +60,14 @@ class AuthController extends Controller
         ]);
 
         $credentials = request(['email', 'password']);
+        $credentials['active'] = 1;
+        $credentials['deleted_at'] = null;
 
-        if (! $token = auth()->attempt($credentials)) {
+        $customClaims = [];
+        if ($request->remember_me)
+            $customClaims = ['exp' => Carbon::now()->addWeeks(1)->getTimestamp()];
+
+        if (! $token = auth()->claims($customClaims)->attempt($credentials)) {
             return response()->json([
                 'error' => 'Unauthorized'
             ], 401);
@@ -69,8 +75,8 @@ class AuthController extends Controller
 
         return response()->json([
             'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 60
+            'token_type' => 'Bearer',
+            'expires_at' => Carbon::createFromTimestamp(auth()->payload()->get('exp'))->toDateTimeString()
         ]);
     }
 
